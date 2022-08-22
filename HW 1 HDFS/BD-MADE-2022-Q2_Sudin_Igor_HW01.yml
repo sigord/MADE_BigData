@@ -1,0 +1,69 @@
+beginner.how_many_items_in_hdfs:
+    stdin: 9
+intermediate.hdfs_list_recursively:
+    stdin: hdfs dfs -ls -R /data/wiki
+intermediate.hdfs_list_recursively_human_readable:
+    stdin: hdfs dfs -ls -R -h /data/wiki
+intermediate.hdfs_file_replication_factor:
+    stdin: 3
+intermediate.hdfs_folder_replication_factor:
+    stdin: 0
+intermediate.hdfs_describe_size:
+    stdin: actual
+intermediate.hdfs_cumulative_size:
+    stdin:   hdfs dfs -du -s -h /data/wiki
+intermediate.hdfs_create_folder:
+    stdin:  hdfs dfs -mkdir SudinID
+intermediate.hdfs_create_nested_folder:
+    stdin: hdfs dfs -mkdir -p SudinID/1/2/3
+intermediate.hdfs_remove_nested_folders:
+    stdin: hdfs dfs -rm -r SudinID/*
+intermediate.hdfs_trash_behavior:
+    stdin: |-
+        hdfs dfs -rm -skipTrash
+        Folder with delayed file deletion
+intermediate.hdfs_create_empty_file:
+    stdin: hdfs dfs -touchz SudinID/test
+intermediate.hdfs_create_small_file:
+    stdin: hdfs dfs -put small.txt SudinID/
+intermediate.hdfs_output_file:
+    stdin: hdfs dfs -cat SudinID/small.txt
+intermediate.hdfs_output_file_end:
+    stdin: hdfs dfs -tail SudinID/small.txt
+intermediate.hdfs_output_file_start:
+    stdin: hdfs dfs -cat SudinID/small.txt | head -2
+intermediate.hdfs_tail_vs_unix_tail:
+    stdin: tail -c 1024 small.txt
+intermediate.hdfs_copy_file:
+    stdin: hdfs dfs -cp SudinID/small.txt SudinID/small_copy.txt
+intermediate.hdfs_move_file:
+    stdin: hdfs dfs -mv SudinID/small_copy.txt SudinID/NewDir
+intermediate.hdfs_download_and_concatenate:
+    stdin: hdfs dfs -getmerge SudinID/small.txt SudinID/NewDir/small_copy.txt small_local.txt
+advanced.hdfs_set_file_replication:
+    stdin: hdfs dfs -setrep -w 2 SudinID/small.txt
+advanced.hdfs_get_files_and_block:
+    stdin: hdfs fsck SudinID -files -blocks -locations
+advanced.hdfs_get_block_information:
+    stdin: hdfs fsck -blockId blk_1106587090
+advanced.hdfs_dfs_architecture:
+    stdin: |-
+        hdfs fsck /data/wiki -files -blocks -locations
+        sudo -i -u hdfsuser
+        hdfs fsck -blockId blk_1073743032
+        ssh brain-node2.bigdatateam.org
+        find /srv/disk1/hadoop/datanode/ -name "blk_1073743032"
+        tail /srv/disk1/hadoop/datanode/current/BP-981064612-78.46.171.101-1581506447497/current/finalized/subdir0/subdir4/blk_1073743032
+
+advanced.webhdfs_read_100B:
+    stdin: |-
+        curl -i "http://brain-master:50070/webhdfs/v1/user/bd_made2022q2/SudinID/small.txt?op=OPEN&length=100"
+        curl "http://brain-node3.bigdatateam.org:50075/webhdfs/v1/user/bd_made2022q2/SudinID/small.txt?op=OPEN&namenoderpcaddress=brain-master.bigdatateam.org:8020&length=100&offset=0"
+advanced.webhdfs_curl_follow_redirects:
+    stdin: curl -L "http://brain-master:50070/webhdfs/v1/user/bd_made2022q2/SudinID/small.txt?op=OPEN"
+advanced.webhdfs_get_file_detailed_information:
+    stdin: curl -L "http://brain-master:50070/webhdfs/v1/user/bd_made2022q2/SudinID/small.txt?op=GETFILESTATUS"
+advanced.webhdfs_change_file_replication:
+    stdin: curl -i -X PUT "http://brain-master:50070/webhdfs/v1/user/bd_made2022q2/SudinID/small.txt?op=SETREPLICATION&user.name=bd_made2022q2&replication=4"
+advanced.webhdfs_append_to_file:
+    stdin: curl -iL -X POST -T small.txt "http://brain-master:50070/webhdfs/v1/user/bd_made2022q2/SudinID/small.txt?op=APPEND&user.name=bd_made2022q2"

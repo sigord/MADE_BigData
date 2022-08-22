@@ -1,0 +1,1 @@
+SELECT `date`, count(*) AS c FROM logs GROUP BY `date` ORDER BY c DESC LIMIT 10;
